@@ -201,7 +201,7 @@ def main():
 
     summary = []
 
-    for name in available_operators():
+for name in available_operators():
 
     graph = build_operator(
         name,
