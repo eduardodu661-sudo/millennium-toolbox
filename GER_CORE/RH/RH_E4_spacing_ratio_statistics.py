@@ -39,7 +39,8 @@ import numpy as np
 import networkx as nx
 
 from GER_CORE.OPERATORS.operator_registry import (
-    get_registered_operators,
+    available_operators,
+    build_operator,
 )
 
 from GER_CORE.OPERATORS.result_manager import (
@@ -59,23 +60,13 @@ EPS = 1e-12
 # Spectrum
 # ============================================================
 
-def laplacian_spectrum(graph):
+def laplacian_spectrum(operator):
 
-    L = nx.laplacian_matrix(
-        graph
-    ).astype(float).toarray()
+    L = operator.laplacian
 
     eigenvalues = np.linalg.eigvalsh(L)
 
-    eigenvalues = np.real_if_close(
-        eigenvalues
-    )
-
-    eigenvalues = np.sort(
-        eigenvalues
-    )
-
-    return eigenvalues
+    return np.sort(eigenvalues)
 
 
 def positive_spectrum(eigenvalues):
@@ -260,9 +251,7 @@ def main():
 
     summary = []
 
-    operators = get_registered_operators()
-
-    for name, builder in operators.items():
+    for name in available_operators():
 
         print("=" * 60)
 
@@ -270,16 +259,24 @@ def main():
 
         print("-" * 60)
 
-        graph = builder(
-            GRAPH_SIZE
+        graph = build_operator(
+
+            name,
+
+            n=GRAPH_SIZE,
+
         )
 
         spectrum = laplacian_spectrum(
+
             graph
+
         )
 
         stats, rows = spacing_ratio_statistics(
+
             spectrum
+
         )
 
         results.save_csv(
@@ -304,23 +301,28 @@ def main():
 
         entry = {
 
-            "operator":
-                name,
+            "operator": name,
 
         }
 
         entry.update(
+
             stats
+
         )
 
         summary.append(
+
             entry
+
         )
 
         for key, value in stats.items():
 
             print(
+
                 f"{key:25s}: {value}"
+
             )
 
         print()
@@ -369,7 +371,9 @@ def main():
     report.append("")
 
     report.append(
+
         results.footer()
+
     )
 
     results.save_txt(
@@ -381,7 +385,9 @@ def main():
     )
 
     print(
+
         results.footer()
+
     )
 
 
