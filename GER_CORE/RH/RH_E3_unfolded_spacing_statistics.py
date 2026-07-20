@@ -181,42 +181,63 @@ def spacing_statistics(eigenvalues):
 def main():
 
     results = ResultManager(
-
         category="RH",
-
         experiment="RH_E3",
-
     )
 
     print(
-
         results.header(
-
             "GER RH-E3\n"
             "Normalized Spacing Statistics"
-
         )
-
     )
 
     summary = []
+    report = []
 
-for name in available_operators():
+    for name in available_operators():
 
-    graph = build_operator(
-        name,
-        n=GRAPH_SIZE,
+        graph = build_operator(
+            name,
+            n=GRAPH_SIZE,
+        )
+
+        eigenvalues = laplacian_spectrum(graph)
+        eigenvalues = positive_spectrum(eigenvalues)
+
+        statistics, spacing_table = spacing_statistics(eigenvalues)
+
+        statistics["operator"] = name
+        summary.append(statistics)
+
+        results.save_csv(
+            f"{name}_spacing.csv",
+            spacing_table,
+        )
+
+        report.append(f"{name}")
+        report.append(f"Samples : {statistics['count']}")
+        report.append(f"Mean    : {statistics['mean']:.6f}")
+        report.append(f"Median  : {statistics['median']:.6f}")
+        report.append(f"Std     : {statistics['std']:.6f}")
+        report.append(f"Var     : {statistics['variance']:.6f}")
+        report.append("")
+
+    results.save_csv(
+        "RH_E3_summary.csv",
+        summary,
     )
-    report.append("")
+
+    results.save_json(
+        "RH_E3_summary.json",
+        summary,
+    )
 
     report.append(results.footer())
 
     results.save_txt(
-
         "RH_E3_execution.txt",
-
         "\n".join(report),
-
     )
 
     print(results.footer())
