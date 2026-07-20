@@ -48,17 +48,13 @@ GRAPH_SIZE = 128
 # Utilities
 # ============================================================
 
-def laplacian_spectrum(graph):
+def laplacian_spectrum(operator):
 
-    L = nx.laplacian_matrix(graph).astype(float).toarray()
+    L = operator.laplacian
 
     eigenvalues = np.linalg.eigvalsh(L)
 
-    eigenvalues = np.sort(
-        np.real_if_close(eigenvalues)
-    )
-
-    return eigenvalues
+    return np.sort(eigenvalues)
 
 
 def positive_spectrum(eigenvalues):
