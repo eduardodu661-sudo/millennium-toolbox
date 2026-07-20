@@ -28,7 +28,8 @@ import numpy as np
 import networkx as nx
 
 from GER_CORE.OPERATORS.operator_registry import (
-    get_registered_operators,
+    available_operators,
+    build_operator,
 )
 
 from GER_CORE.OPERATORS.result_manager import (
@@ -200,95 +201,12 @@ def main():
 
     summary = []
 
-    operators = get_registered_operators()
+    for name in available_operators():
 
-    for name, builder in operators.items():
-
-        print("=" * 60)
-
-        print(name)
-
-        print("-" * 60)
-
-        graph = builder(GRAPH_SIZE)
-
-        spectrum = laplacian_spectrum(graph)
-
-        stats, spacing_rows = spacing_statistics(
-            spectrum
-        )
-
-        results.save_csv(
-
-            f"{name}_spacing.csv",
-
-            spacing_rows,
-
-            header=[
-                "index",
-                "spacing",
-                "normalized_spacing",
-            ],
-
-        )
-
-        row = {
-
-            "operator": name,
-
-        }
-
-        row.update(stats)
-
-        summary.append(row)
-
-        for key, value in stats.items():
-
-            print(f"{key:25s}: {value}")
-
-        print()
-
-    results.save_dict_csv(
-
-        "RH_E3_summary.csv",
-
-        summary,
-
+    graph = build_operator(
+        name,
+        n=GRAPH_SIZE,
     )
-
-    results.save_json(
-
-        "RH_E3_summary.json",
-
-        summary,
-
-    )
-
-    report = []
-
-    report.append(
-
-        results.header(
-
-            "GER RH-E3\n"
-            "Normalized Spacing Statistics"
-
-        )
-
-    )
-
-    report.append(
-
-        f"Operators analysed : {len(summary)}"
-
-    )
-
-    report.append(
-
-        f"Graph size          : {GRAPH_SIZE}"
-
-    )
-
     report.append("")
 
     report.append(results.footer())
