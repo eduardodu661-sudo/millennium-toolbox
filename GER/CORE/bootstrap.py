@@ -20,7 +20,9 @@ or
 Responsibilities
 
 - Registers the official Signature Provider
+- Registers the official Reference Provider
 - Validates the CORE
+- Enables automatic console capture
 - Leaves the framework ready for experiments
 """
 
@@ -35,12 +37,21 @@ from GER.CORE.default_signature_provider import (
     DefaultSignatureProvider,
 )
 
+from GER.CORE.default_reference_provider import (
+    DefaultReferenceProvider,
+)
+
 from GER.CORE.signature_api import (
     register_signature_provider,
+    register_reference_provider,
 )
 
 from GER.CORE.ger_validation import (
     validate_GER_CORE,
+)
+
+from GER.CORE.ger_legacy import (
+    enable as enable_legacy,
 )
 
 
@@ -66,14 +77,46 @@ def initialize():
     )
 
     # -----------------------------------------------------
+    # Register official Reference Provider
+    # -----------------------------------------------------
+
+    register_reference_provider(
+
+        DefaultReferenceProvider(
+
+            signatures_path=(
+                "/content/drive/MyDrive/GER_RESULTS/"
+                "S29_E6.3/signatures/signatures.parquet"
+            ),
+
+            universes_path=(
+                "/content/drive/MyDrive/GER_RESULTS/"
+                "S29_E6.3/universes/universes.parquet"
+            ),
+
+            reference_name="S29_E6.3",
+
+        )
+
+    )
+
+    # -----------------------------------------------------
     # Validate CORE
     # -----------------------------------------------------
 
     validate_GER_CORE()
 
+    # -----------------------------------------------------
+    # Enable automatic console capture
+    # -----------------------------------------------------
+
+    enable_legacy()
+
     print()
 
     print("Official Signature Provider : Registered")
+    print("Official Reference Provider : Registered")
+    print("Legacy Console Capture      : Enabled")
     print("GER CORE ready for experiments.")
 
     print("=" * 40)
